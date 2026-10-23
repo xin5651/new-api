@@ -16,20 +16,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-// Custom 二次开发：监控中心（见仓库根目录 CUSTOM.md）
-import { createFileRoute, redirect } from '@tanstack/react-router'
+// Custom 二次开发：监控中心（见仓库根目录 CUSTOM.md）。个人区入口，登录用户可用。
+import { createFileRoute } from '@tanstack/react-router'
 
 import { MonitorCenter } from '@/features/monitor'
-import { ROLE } from '@/lib/roles'
-import { useAuthStore } from '@/stores/auth-store'
 
 export const Route = createFileRoute('/_authenticated/monitor/')({
-  beforeLoad: () => {
-    const { auth } = useAuthStore.getState()
-
-    if (!auth.user || auth.user.role < ROLE.ADMIN) {
-      throw redirect({ to: '/403' })
-    }
-  },
   component: MonitorCenter,
 })

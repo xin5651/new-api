@@ -29,6 +29,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatTimestampToDate } from '@/lib/format'
+import { ROLE } from '@/lib/roles'
+import { useAuthStore } from '@/stores/auth-store'
 
 import {
   getIQTestRuns,
@@ -198,6 +200,8 @@ function IQRunList(props: IQRunListProps) {
 
 export function MonitorCenter() {
   const { t } = useTranslation()
+  const user = useAuthStore((s) => s.auth.user)
+  const isAdmin = (user?.role ?? 0) >= ROLE.ADMIN
   const [tab, setTab] = useState('channels')
   const [overview, setOverview] = useState<MonitorOverview | null>(null)
   const [channels, setChannels] = useState<MonitorChannelItem[]>([])
@@ -325,10 +329,12 @@ export function MonitorCenter() {
         </span>
       </SectionPageLayout.Title>
       <SectionPageLayout.Actions>
-        <Button variant='outline' onClick={() => setSettingsOpen(true)}>
-          <Settings2 className='mr-1 h-4 w-4' />
-          {t('Monitor Settings')}
-        </Button>
+        {isAdmin ? (
+          <Button variant='outline' onClick={() => setSettingsOpen(true)}>
+            <Settings2 className='mr-1 h-4 w-4' />
+            {t('Monitor Settings')}
+          </Button>
+        ) : null}
         <Button onClick={handleProbeAll} disabled={probingAll}>
           <Gauge className='mr-1 h-4 w-4' />
           {t('Probe All')}

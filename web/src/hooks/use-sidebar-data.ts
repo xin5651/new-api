@@ -133,6 +133,11 @@ export function useSidebarData(): SidebarData {
             url: '/tickets',
             icon: LifeBuoy,
           },
+          {
+            title: t('Monitor Center'),
+            url: '/monitor',
+            icon: Gauge,
+          },
         ],
       },
       {
@@ -143,11 +148,6 @@ export function useSidebarData(): SidebarData {
             title: t('Channels'),
             url: '/channels',
             icon: Radio,
-          },
-          {
-            title: t('Monitor Center'),
-            url: '/monitor',
-            icon: Gauge,
           },
           {
             title: t('Models'),
