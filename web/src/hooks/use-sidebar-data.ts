@@ -29,6 +29,7 @@ import {
   ListTodo,
   MessageSquare,
   PlugZap,
+  Gauge,
   Radio,
   ServerCog,
   Settings,
@@ -142,6 +143,11 @@ export function useSidebarData(): SidebarData {
             title: t('Channels'),
             url: '/channels',
             icon: Radio,
+          },
+          {
+            title: t('Monitor Center'),
+            url: '/monitor',
+            icon: Gauge,
           },
           {
             title: t('Models'),
