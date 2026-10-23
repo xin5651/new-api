@@ -68,6 +68,7 @@ git push origin custom
 - 数据库：新增 `channel_probes`、`iq_test_runs` 两张表（AutoMigrate 自动建），不改上游原有表。
 - 验证：`go build ./...` 通过；前端 build/typecheck/lint（改动文件）全过；本地实跑（SQLite + 本地 mock 上游）全流程：探测健康（39ms）→智商测试满分 100（12/12、结论正常）→把 mock 切成全答「不知道」后重测得 0 分、结论「疑似降智」且掉分预警亮起→设置保存回读一致→普通用户访问监控接口被拒。
 - 回滚办法：删除上述新增文件，还原 `model/main.go`、`model/system_task.go`、`controller/system_task_handlers.go`、`router/api-router.go`、侧边栏 hooks 与 i18n 的对应改动，重新构建；两张新表可保留不用或手动 DROP。
+- 2026-10-23 晚调整（辛欣拍板）：入口由左侧「管理员」区挪到「个人」区，权限放开给普通登录用户——`router/api-router.go` 中 monitor 路由组改 `UserAuth`，仅 `PUT /api/monitor/settings` 单独保留 `AdminAuth`（防普通用户改全局探测配置）；前端去掉 monitor 路由的管理员守卫，「监控设置」按钮仅管理员可见；侧边栏配置 `/monitor` 改属 personal 区。已实跑验证：普通用户可看概览/渠道、可探测、可跑智商测试（100 分），改设置被拒。
 
 <!-- 新改动按下面格式往下加：
 ### YYYY-MM-DD — 功能名

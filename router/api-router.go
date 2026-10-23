@@ -332,9 +332,10 @@ func SetApiRouter(router *gin.Engine) {
 		{
 			ticketAdminRoute.GET("/", controller.GetAllTickets)
 		}
-		// Monitor center (custom 二次开发, 见 CUSTOM.md)：仅管理员
+		// Monitor center (custom 二次开发, 见 CUSTOM.md)：登录用户可用（个人区入口）；
+		// 仅设置保存保留管理员权限，避免普通用户改全局探测配置。
 		monitorRoute := apiRouter.Group("/monitor")
-		monitorRoute.Use(middleware.AdminAuth())
+		monitorRoute.Use(middleware.UserAuth())
 		{
 			monitorRoute.GET("/overview", controller.GetMonitorOverview)
 			monitorRoute.GET("/channels", controller.GetMonitorChannels)
@@ -344,7 +345,11 @@ func SetApiRouter(router *gin.Engine) {
 			monitorRoute.POST("/iq/run", controller.RunIQTestHandler)
 			monitorRoute.GET("/iq/runs", controller.GetIQTestRuns)
 			monitorRoute.GET("/settings", controller.GetMonitorSettings)
-			monitorRoute.PUT("/settings", controller.UpdateMonitorSettings)
+		}
+		monitorAdminRoute := apiRouter.Group("/monitor")
+		monitorAdminRoute.Use(middleware.AdminAuth())
+		{
+			monitorAdminRoute.PUT("/settings", controller.UpdateMonitorSettings)
 		}
 		handlePermissionRoute(apiRouter.Group("", middleware.DisableCache(), middleware.AdminAuth()), http.MethodGet, "/audit", authz.AuditRead, controller.GetAuditLogs)
 		apiRouter.GET("/audit/self", middleware.DisableCache(), middleware.UserAuth(), controller.GetAuditLogs)
