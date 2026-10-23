@@ -36,6 +36,7 @@ git push origin custom
 | 日期 | 功能/改动 | 类型 | 涉及文件 | 是否改了上游原文件 |
 |---|---|---|---|---|
 | 2026-10-23 | 建立 custom 分支 + 本清单 | 基础设施 | `CUSTOM.md`（新增） | 否 |
+| 2026-10-23 | 工单功能：登录后提交工单、我的工单、回复、管理员处理全部工单 | 新增功能 | 新增 `model/ticket.go`、`controller/ticket.go`、`web/src/features/tickets/`、`web/src/routes/_authenticated/tickets/`；修改 `model/main.go`（AutoMigrate 注册 2 行）、`router/api-router.go`（路由 15 行）、`web/src/hooks/use-sidebar-data.ts`、`web/src/hooks/use-sidebar-config.ts`、`web/src/routeTree.gen.ts`（构建生成）、`web/src/i18n/locales/*.json`（7 个文件各加 36 个键） | 是（仅上述小改动） |
 
 类型可选：新增功能 / 接口 / 页面 / 配置 / 修复 / 数据库
 
@@ -46,6 +47,15 @@ git push origin custom
 - 内容：从 `main` 拉出 `custom` 长期分支，新增本清单文件。
 - 原因：二次开发与上游更新隔离，后续同步上游不冲掉自己的改动。
 - 影响的上游原文件：无。
+
+### 2026-10-23 — 工单功能
+
+- 内容：登录用户可在左侧「个人」区进入「工单」页提交工单（标题/分类/优先级/内容）、查看自己的工单、点开看回复并继续回复、可关闭自己的工单；管理员多一个「全部工单」视图，可回复（状态自动变「已回复」）、标记已回复、关闭任意工单。普通用户看不到别人的工单（接口层校验）。
+- 接口：`POST /api/ticket/` 提交；`GET /api/ticket/self` 我的工单；`GET /api/ticket/` 全部工单（管理员）；`GET /api/ticket/:id` 详情（含回复）；`POST /api/ticket/:id/reply` 回复；`PUT /api/ticket/:id/status` 改状态（普通用户仅能关闭自己的）。
+- 涉及文件：新增 `model/ticket.go`、`controller/ticket.go`、`web/src/features/tickets/`（types/constants/api/index + 两个 dialog 组件）、`web/src/routes/_authenticated/tickets/index.tsx`；修改 `model/main.go`（AutoMigrate 加 `&Ticket{}`、`&TicketReply{}`）、`router/api-router.go`（新增 ticket 路由组）、侧边栏两处 hooks、7 个 i18n 文件（各 +36 键）、`web/src/routeTree.gen.ts`（构建自动生成）。
+- 数据库：新增 `tickets`、`ticket_replies` 两张表（AutoMigrate 自动建），不改上游原有表。
+- 验证：本地 `go build ./...` 通过、`bun run build` 通过、typecheck/lint（改动文件）通过；本地实跑（SQLite）完整走通：提交→列表→详情→回复→状态变化→关闭→关闭后拒绝回复→普通用户越权访问被拒→普通用户访问管理员列表被拒。
+- 回滚办法：删除上述新增文件，还原 `model/main.go`、`router/api-router.go`、侧边栏 hooks 与 i18n 的对应改动，重新构建；数据库两张新表可保留不用或手动 DROP。
 
 <!-- 新改动按下面格式往下加：
 ### YYYY-MM-DD — 功能名
